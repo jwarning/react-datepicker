@@ -94,7 +94,9 @@ var Calendar = React.createClass({displayName: "Calendar",
 
   getInitialState: function() {
     return {
-      date: new DateUtil(this.props.selected).clone()
+      date: this.props.selected ?
+        new DateUtil(this.props.selected).clone() :
+        new DateUtil(moment()).clone()
     };
   },
 
@@ -102,7 +104,9 @@ var Calendar = React.createClass({displayName: "Calendar",
     // When the selected date changed
     if (nextProps.selected !== this.props.selected) {
       this.setState({
-        date: new DateUtil(nextProps.selected).clone()
+        date: nextProps.selected ?
+          new DateUtil(nextProps.selected).clone() :
+          new DateUtil(moment()).clone()
       });
     }
   },
@@ -146,7 +150,7 @@ var Calendar = React.createClass({displayName: "Calendar",
         day: day, 
         date: this.state.date, 
         onClick: this.handleDayClick.bind(this, day), 
-        selected: new DateUtil(this.props.selected)})
+        selected: new DateUtil(this.props.selected || moment())})
     );
   },
 
@@ -205,7 +209,9 @@ var DateInput = React.createClass({displayName: "DateInput",
 
   getInitialState: function() {
     return {
-      value: this.props.date.format(this.props.dateFormat)
+      value: this.props.date ?
+        this.props.date.format(this.props.dateFormat) :
+        this.props.date
     };
   },
 
@@ -217,7 +223,9 @@ var DateInput = React.createClass({displayName: "DateInput",
     this.toggleFocus(newProps.focus);
 
     this.setState({
-      value: newProps.date.format(this.props.dateFormat)
+      value: newProps.date ?
+        newProps.date.format(this.props.dateFormat) :
+        newProps.date
     });
   },
 
@@ -232,12 +240,18 @@ var DateInput = React.createClass({displayName: "DateInput",
   handleChange: function(event) {
     var date = moment(event.target.value, this.props.dateFormat, true);
 
-    this.setState({
-      value: event.target.value
-    });
-
     if (this.isValueAValidDate()) {
+      this.setState({
+        value: event.target.value
+      });
+
       this.props.setSelected(new DateUtil(date));
+    } else {
+      this.setState({
+        value: null
+      });
+
+      this.props.setSelected(null);
     }
   },
 
@@ -265,6 +279,7 @@ var DateInput = React.createClass({displayName: "DateInput",
       ref: "input", 
       type: "text", 
       value: this.state.value, 
+      placeholder: this.props.placeholderText, 
       onClick: this.handleClick, 
       onKeyDown: this.handleKeyDown, 
       onFocus: this.props.onFocus, 
@@ -315,7 +330,8 @@ var DatePicker = React.createClass({displayName: "DatePicker",
   },
 
   setSelected: function(date) {
-    this.props.onChange(date.moment());
+    if (date) this.props.onChange(date.moment());
+    else this.props.onChange(null);
   },
 
   onInputClick: function() {
@@ -348,7 +364,8 @@ var DatePicker = React.createClass({displayName: "DatePicker",
           handleClick: this.onInputClick, 
           handleEnter: this.hideCalendar, 
           setSelected: this.setSelected, 
-          hideCalendar: this.hideCalendar}), 
+          hideCalendar: this.hideCalendar, 
+          placeholderText: this.props.placeholderText}), 
         this.calendar()
       )
     );

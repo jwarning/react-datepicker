@@ -30,7 +30,7 @@
         getInitialState: function() {
           return {
             start_date: moment(),
-            end_date: moment()
+            end_date: null
           };
         },
 
@@ -51,13 +51,15 @@
             DatePickerFactory({
               key: 'example1',
               selected: this.state.start_date,
-              onChange: this.handleStartDateChange
+              onChange: this.handleStartDateChange,
+              placeholderText: 'Example1'
             }),
             DatePickerFactory({
               key: 'example2',
               selected: this.state.end_date,
               dateFormat: "YYYY/MM/DD",
-              onChange: this.handleEndDateChange
+              onChange: this.handleEndDateChange,
+              placeholderText: 'Example2'
             })
           ]);
         }
